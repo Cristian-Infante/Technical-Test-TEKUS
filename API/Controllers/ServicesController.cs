@@ -8,41 +8,36 @@ namespace API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class UsersController(IMediator med) : ControllerBase
+public class ServicesController(IMediator med) : ControllerBase
 {
     [HttpGet]
-    [ProducesResponseType(typeof(PagedResult<UserDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedResult<ServiceDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> GetAll(
         [FromQuery] int pageNumber = 1,
         [FromQuery] int pageSize   = 10,
-        [FromQuery] string sortBy  = "username",
+        [FromQuery] string sortBy  = "name",
         [FromQuery] string? filter = null
-    ) {
-        var result = await med.Send(
-            new GetUsersQuery(pageNumber, pageSize, sortBy, filter)
-        );
-        return Ok(result);
-    }
+    ) => Ok(await med.Send(new GetServicesQuery(pageNumber, pageSize, sortBy, filter)));
 
     [HttpGet("{id:guid}")]
-    [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ServiceDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Get(Guid id)
     {
-        var u = await med.Send(new GetUserByIdQuery(id));
-        return u is null ? NotFound() : Ok(u);
+        var dto = await med.Send(new GetServiceByIdQuery(id));
+        return dto is null ? NotFound() : Ok(dto);
     }
 
     [HttpPost]
     [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> Create(CreateUserCommand c)
+    public async Task<IActionResult> Create([FromBody] CreateServiceCommand cmd)
     {
-        var id = await med.Send(c);
+        var id = await med.Send(cmd);
         return CreatedAtAction(nameof(Get), new { id }, null);
     }
 
@@ -51,9 +46,9 @@ public class UsersController(IMediator med) : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update(Guid id, UpdateUserCommand c)
+    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateServiceCommand cmd)
     {
-        await med.Send(c with { Id = id });
+        await med.Send(cmd with { Id = id });
         return NoContent();
     }
 
@@ -64,7 +59,7 @@ public class UsersController(IMediator med) : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(Guid id)
     {
-        await med.Send(new DeleteUserCommand(id));
+        await med.Send(new DeleteServiceCommand(id));
         return NoContent();
     }
 }

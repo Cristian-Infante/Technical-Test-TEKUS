@@ -4,7 +4,7 @@ namespace Domain.Interfaces;
 
 public interface IRepository<T> where T : class
 {
-    T GetById(int id);
+    T GetById(Guid id);
     IEnumerable<T> GetAll();
     IEnumerable<T> Find(Expression<Func<T, bool>> predicate);
 

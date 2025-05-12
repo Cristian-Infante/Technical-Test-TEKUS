@@ -11,7 +11,7 @@ namespace API.Controllers;
 public class CountriesController(IMediator mediator) : ControllerBase
 {
     [HttpGet]
-    [ProducesResponseType(typeof(IEnumerable<CountryDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedResult<CountryDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Get(
         [FromQuery] int pageNumber = 1,
@@ -28,6 +28,7 @@ public class CountriesController(IMediator mediator) : ControllerBase
     [HttpGet("{iso}")]
     [ProducesResponseType(typeof(CountryDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetByIso(string iso)
     {
         var country = await mediator.Send(new GetCountryByIsoQuery(iso));

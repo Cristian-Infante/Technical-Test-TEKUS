@@ -7,7 +7,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 {
     public DbSet<Provider> Providers { get; set; }
     public DbSet<Service> Services { get; set; }
-    public DbSet<Country> Countries { get; set; }
     public DbSet<CustomField> CustomFields { get; set; }
     public DbSet<ProviderService> ProviderServices { get; set; }
     public DbSet<ProviderServiceCountry> ProviderServiceCountries { get; set; }
@@ -15,6 +14,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        // Aquí le indico a EF que no genere tabla para Country
+        modelBuilder.Ignore<Country>();
+
         modelBuilder.Entity<Provider>(b =>
         {
             b.ToTable("Providers");
@@ -48,26 +50,19 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 .HasForeignKey(ps => ps.ServiceId);
         });
 
-        modelBuilder.Entity<Country>(b =>
-        {
-            b.ToTable("Countries");
-            b.HasKey(x => x.IsoCode);
-            b.Property(x => x.IsoCode)
-                .HasMaxLength(2)
-                .IsFixedLength()
-                .IsRequired();
-            b.Property(x => x.Name).IsRequired();
-
-            b.HasMany(x => x.ProviderServiceCountries)
-                .WithOne(psc => psc.Country)
-                .HasForeignKey(psc => psc.CountryIsoCode);
-        });
-
         modelBuilder.Entity<ProviderService>(b =>
         {
             b.ToTable("ProviderServices");
             b.HasKey(x => x.ProviderServiceId);
             b.Property(x => x.ProviderServiceId).ValueGeneratedOnAdd();
+
+            b.HasOne(ps => ps.Provider)
+                .WithMany(p => p.ProviderServices)
+                .HasForeignKey(ps => ps.ProviderId);
+
+            b.HasOne(ps => ps.Service)
+                .WithMany(s => s.ProviderServices)
+                .HasForeignKey(ps => ps.ServiceId);
 
             b.HasMany(x => x.ServiceCountries)
                 .WithOne(psc => psc.ProviderService)
@@ -78,6 +73,10 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         {
             b.ToTable("ProviderServiceCountries");
             b.HasKey(x => new { x.ProviderServiceId, x.CountryIsoCode });
+
+            b.HasOne(psc => psc.ProviderService)
+                .WithMany(ps => ps.ServiceCountries)
+                .HasForeignKey(psc => psc.ProviderServiceId);
         });
 
         modelBuilder.Entity<CustomField>(b =>

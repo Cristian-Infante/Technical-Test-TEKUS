@@ -11,7 +11,7 @@ namespace Infrastructure.Repositories
         protected readonly AppDbContext Context = context;
         private readonly DbSet<T> _entities = context.Set<T>();
 
-        public virtual T GetById(int id) => _entities.Find(id)!;
+        public virtual T GetById(Guid id) => _entities.Find(id)!;
 
         public virtual IEnumerable<T> GetAll() => _entities.ToList();
 

@@ -8,17 +8,21 @@ namespace Infrastructure.Repositories;
 public class ProviderRepository(AppDbContext ctx) : Repository<Provider>(ctx), IProviderRepository
 {
     public Task<Provider?> GetByIdWithServicesAsync(Guid id) =>
-        Context.Set<Provider>()
+        Context.Providers
+            .Include(p => p.CustomFields)
             .Include(p => p.ProviderServices)
             .ThenInclude(ps => ps.Service)
-            .Include(p => p.CustomFields)
+            .Include(p => p.ProviderServices)
+            .ThenInclude(ps => ps.ServiceCountries)
             .SingleOrDefaultAsync(p => p.Id == id);
 
     public Task<IEnumerable<Provider>> GetAllWithServicesAsync() =>
-        Context.Set<Provider>()
+        Context.Providers
+            .Include(p => p.CustomFields)
             .Include(p => p.ProviderServices)
             .ThenInclude(ps => ps.Service)
-            .Include(p => p.CustomFields)
+            .Include(p => p.ProviderServices)
+            .ThenInclude(ps => ps.ServiceCountries)
             .ToListAsync()
-            .ContinueWith(IEnumerable<Provider> (t) => t.Result);
+            .ContinueWith(t => (IEnumerable<Provider>)t.Result);
 }

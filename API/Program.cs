@@ -30,15 +30,20 @@ builder.Services.AddMediatR(typeof(GetCountriesQueryHandler));
 builder.Services.AddMediatR(typeof(GetCountryByIsoQueryHandler));
 builder.Services.AddMediatR(typeof(GetUsersQueryHandler));
 builder.Services.AddMediatR(typeof(GetUserByIdQueryHandler));
+builder.Services.AddMediatR(typeof(GetProvidersQueryHandler));
+builder.Services.AddMediatR(typeof(GetServicesQueryHandler));
+builder.Services.AddMediatR(typeof(GetServiceByIdQueryHandler));
 
 builder.Services.AddMediatR(typeof(CreateUserCommandHandler));
 builder.Services.AddMediatR(typeof(UpdateUserCommandHandler));
 builder.Services.AddMediatR(typeof(DeleteUserCommandHandler));
 builder.Services.AddMediatR(typeof(LoginCommandHandler));
+builder.Services.AddMediatR(typeof(CreateProviderCommandHandler));
+builder.Services.AddMediatR(typeof(DeleteProviderCommandHandler));
+builder.Services.AddMediatR(typeof(CreateServiceCommandHandler));
+builder.Services.AddMediatR(typeof(UpdateServiceCommandHandler));
+builder.Services.AddMediatR(typeof(DeleteServiceCommandHandler));
 
-builder.Services.AddMediatR(typeof(GetUserByIdQueryHandler));
-builder.Services.AddMediatR(typeof(GetUserByIdQueryHandler));
-builder.Services.AddMediatR(typeof(GetUserByIdQueryHandler));
 
 builder.Services.AddJwtAuthentication(builder.Configuration);
 
